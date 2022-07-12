@@ -1,0 +1,34 @@
+{
+  "name": "upload-notion-images-to-cloudinary",
+  "version": "1.0.0",
+  "description": "Script to move images used in Notion blocks and covers from Notion hosting to Cloudinary",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "node --experimental-modules --es-module-specifier-resolution=node ./index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "type": "module",
+  "keywords": [
+    "notion",
+    "api",
+    "cloudinary",
+    "script",
+    "images"
+  ],
+  "author": "Guillermo de la Puente",
+  "license": "ISC",
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node18": "^1.0.1",
+    "@tsconfig/recommended": "^1.0.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.0.0",
+    "cloudinary": "^1.30.0"
+  }
+}
