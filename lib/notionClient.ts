@@ -30,7 +30,7 @@ async function fetchAllBlocks(
   const blocks = result.results;
 
   // Retrieve block children for nested blocks (one level deep), for example toggle blocks
-  // inspired by https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
+  // https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
   const childBlocks = await Promise.all(
     blocks
       .filter((block) => "has_children" in block && block.has_children)
