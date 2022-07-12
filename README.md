@@ -1,6 +1,6 @@
 # Upload Notion Images to Cloudinary
 
-Script to move images in Notion from Notion hosting to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API](https://cloudinary.com/documentation/node_image_and_video_upload).
+Script to move images in Notion to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API](https://cloudinary.com/documentation/node_image_and_video_upload).
 
 **⭐️ Contributions are welcome**. If this code can be useful to you, consider improving it and opening a pull request. There are things to be done, like:
 * Handling errors more gracefully

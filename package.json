@@ -1,7 +1,7 @@
 {
   "name": "upload-notion-images-to-cloudinary",
   "version": "1.0.0",
-  "description": "Script to move images used in Notion blocks and covers from Notion hosting to Cloudinary",
+  "description": "Script to move images in Notion to Cloudinary",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
