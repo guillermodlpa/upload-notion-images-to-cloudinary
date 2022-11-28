@@ -9,7 +9,7 @@
     "start": "node --experimental-modules --es-module-specifier-resolution=node ./index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=16"
   },
   "type": "module",
   "keywords": [
