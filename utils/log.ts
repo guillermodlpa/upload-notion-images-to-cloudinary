@@ -1,10 +1,14 @@
 const log = {
   debug: function (message: string, ...args: any[]) {
-    process.stdout.write(`\n⚪️ ${message}`);
+    process.stdout.write(
+      `\n[upload-notion-images-to-cloudinary][DEBUG] ${message}`
+    );
   },
 
   info: function (message: string, ...args: any[]) {
-    process.stdout.write(`\n🔵 ${message}`);
+    process.stdout.write(
+      `\n[upload-notion-images-to-cloudinary][INFO] ${message}`
+    );
   },
 
   appendSentence: function (message: string) {
@@ -12,7 +16,10 @@ const log = {
   },
 
   error: function (message: string, ...args: any[]) {
-    console.error(`❌ ${message}`, ...args);
+    console.error(
+      `[upload-notion-images-to-cloudinary][ERROR] ${message}`,
+      ...args
+    );
   },
 };
 
