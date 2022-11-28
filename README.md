@@ -2,13 +2,7 @@
 
 Script to move images in Notion to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API](https://cloudinary.com/documentation/node_image_and_video_upload).
 
-**⭐️ Contributions are welcome**. If this code can be useful to you, consider improving it and opening a pull request. There are things to be done, like:
-* Handling errors more gracefully
-* Supporting paginated results for large databases and pages
-* Using the page title for the cover image filename
-* Adding CI
-* Writing tests
-* Publishing to NPM
+**⭐️ Contributions are welcome**. Read Contribute section below.
 
 ## Why is this needed?
 
@@ -31,15 +25,33 @@ This technology has been used for my website, build with Next.js and Notion. [ht
 1. Obtain your Cloudinary API Environment Variable.
 1. Optionally, choose a folder within your Cloudinary account to upload images to. You can pass it later with `CLOUDINARY_UPLOAD_FOLDER`.
 1. Enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
+1. Install the package:
+    ```console
+    $ npm install @guillermodlpa/upload-notion-images-to-cloudinary
+    ```
+1. Add it to the prebuild step, so it will get executed always before the production build is made:
+   ```json
+    // package.json
+    {
+      "scripts": {
+        "postbuild": "@guillermodlpa/upload-notion-images-to-cloudinary"
+      },
+    }
+    ```
+
+### Usage during development
+
+Follow steps above 1 through 5, and then:
+
 1. Run installation of dependencies:
     ```console
     $ npm install
     ```
-1. Compile the TypeScript source code:
+3. Compile the TypeScript source code:
     ```console
     $ npm run build
     ```
-1. Execute the script passing the parameters as environment variables:
+4. Execute the script passing the parameters as environment variables:
     ```console
     $ NOTION_TOKEN=[your token] \
     NOTION_DATABASE_ID=[your DB ID] \
@@ -51,11 +63,20 @@ This technology has been used for my website, build with Next.js and Notion. [ht
 ### Example output
 
 ```
-🔵 Fetching pages. Found 1
-⚪️ 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: cover image not hosted in Notion
-🔵 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: fetching image blocks. Found 2
-🔵 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: image hosted in Notion. Image downloaded. Uploaded to Cloudinary. Updated in Notion ✅
-⚪️ 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: db95193f-44a4-4a66-97b8-6d2850d499ab: not hosted in Notion
-⚪️ 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: 3f0104fb-e8aa-488f-a3b6-9ae8c2b7622b: not hosted in Notion
-🔵 End.
+[upload-notion-images-to-cloudinary][INFO] Fetching pages. Found 1
+[upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: cover image not hosted in Notion
+[upload-notion-images-to-cloudinary][INFO] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: fetching image blocks. Found 2
+[upload-notion-images-to-cloudinary][INFO] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: image hosted in Notion. Image downloaded. Uploaded to Cloudinary. Updated in Notion ✅
+[upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: db95193f-44a4-4a66-97b8-6d2850d499ab: not hosted in Notion
+[upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: 3f0104fb-e8aa-488f-a3b6-9ae8c2b7622b: not hosted in Notion
+[upload-notion-images-to-cloudinary][INFO] End.
 ```
+
+## Contribute
+
+⭐️ Contributions are welcome. If this code can be useful to you, consider improving it and opening a pull request. There are things to be done, like:
+* Handling errors more gracefully
+* Supporting paginated results for large databases and pages
+* Using the page title for the cover image filename
+* Adding CI
+* Writing tests
