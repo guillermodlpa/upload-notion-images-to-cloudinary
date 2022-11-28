@@ -27,14 +27,14 @@ This technology has been used for my website, build with Next.js and Notion. [ht
 1. Enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
 1. Install the package:
     ```console
-    $ npm install @guillermodlpa/upload-notion-images-to-cloudinary
+    $ npm install upload-notion-images-to-cloudinary
     ```
 1. Add it to the prebuild step, so it will get executed always before the production build is made:
    ```json
     // package.json
     {
       "scripts": {
-        "postbuild": "@guillermodlpa/upload-notion-images-to-cloudinary"
+        "postbuild": "upload-notion-images-to-cloudinary"
       },
     }
     ```
