@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import { BLOCK_TYPE_IMAGE } from "./constants/blockTypes";
 import * as cloudinaryClient from "./lib/cloudinaryClient";
 import {
@@ -30,7 +33,7 @@ for (const page of pages) {
       : undefined;
 
   if (!coverUrl) {
-    log.debug(`${page.id}: cover image not hosted in Notion`);
+    log.debug(`${page.id}: cover image already not hosted in Notion`);
   } else {
     log.info(`${page.id}: cover image hosted in Notion`);
 
@@ -50,7 +53,7 @@ for (const page of pages) {
     log.appendSentence("Updated in Notion ✅");
   }
 
-  log.info(`${page.id}: fetching image blocks`);
+  log.info(`${page.id}: fetching image blocks...`);
   const imageBlocks = await fetchAllImageBlocks(page.id);
   log.appendSentence(`Found ${imageBlocks.length}`);
 
@@ -64,7 +67,7 @@ for (const page of pages) {
         ? imageBlock[BLOCK_TYPE_IMAGE].file.url
         : null;
     if (!imageUrl) {
-      log.debug(`${page.id}: ${imageBlock.id}: not hosted in Notion`);
+      log.debug(`${page.id}: ${imageBlock.id}: already not hosted in Notion`);
       continue;
     }
     log.info(`${page.id}: image hosted in Notion`);

@@ -3,16 +3,20 @@ import { GetBlockResponse } from "@notionhq/client/build/src/api-endpoints";
 import { BLOCK_TYPE_IMAGE } from "../constants/blockTypes";
 import throwMissingEnvVarError from "../utils/throwMissingEnvVarError";
 
-const notionToken =
-  process.env.NOTION_TOKEN || throwMissingEnvVarError("NOTION_TOKEN");
-
-const notion = new Client({
-  auth: notionToken,
-  logLevel:
-    process.env.NODE_ENV === "development" ? LogLevel.DEBUG : LogLevel.WARN,
-});
+function getNotionClient(): Client {
+  let notion: Client | undefined = undefined;
+  if (!notion) {
+    notion = new Client({
+      auth: process.env.NOTION_TOKEN || throwMissingEnvVarError("NOTION_TOKEN"),
+      logLevel:
+        process.env.NODE_ENV === "development" ? LogLevel.DEBUG : LogLevel.WARN,
+    });
+  }
+  return notion;
+}
 
 export async function getPagesFromDatabase(notionDatabaseId: string) {
+  const notion = getNotionClient();
   const result = await notion.databases.query({
     database_id: notionDatabaseId,
   });
@@ -23,6 +27,7 @@ export async function getPagesFromDatabase(notionDatabaseId: string) {
 async function fetchAllBlocks(
   pageIdOrBlockId: string
 ): Promise<GetBlockResponse[]> {
+  const notion = getNotionClient();
   const result = await notion.blocks.children.list({
     block_id: pageIdOrBlockId,
   });
@@ -58,6 +63,7 @@ export async function updateImageBlockExternalUrl(
   blockId: string,
   url: string
 ) {
+  const notion = getNotionClient();
   return notion.blocks.update({
     block_id: blockId,
     image: {
@@ -69,6 +75,7 @@ export async function updateImageBlockExternalUrl(
 }
 
 export async function updatePageCoverExternalUrl(pageId: string, url: string) {
+  const notion = getNotionClient();
   return notion.pages.update({
     page_id: pageId,
     cover: {
