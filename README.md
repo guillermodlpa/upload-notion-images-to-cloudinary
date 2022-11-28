@@ -1,5 +1,7 @@
 # Upload Notion Images to Cloudinary
 
+[![npm version](https://img.shields.io/npm/v/upload-notion-images-to-cloudinary.svg?style=flat-square)](https://www.npmjs.com/package/upload-notion-images-to-cloudinary)
+
 Script to move images in Notion to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API](https://cloudinary.com/documentation/node_image_and_video_upload).
 
 **⭐️ Contributions are welcome**. Read Contribute section below.
