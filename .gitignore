@@ -1,3 +1,5 @@
 /node_modules
 *.js
 .env
+dist
+tsconfig.tsbuildinfo

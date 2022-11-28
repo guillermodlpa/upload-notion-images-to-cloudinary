@@ -6,12 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node --experimental-modules --es-module-specifier-resolution=node ./index.js"
+    "start": "node --experimental-modules --es-module-specifier-resolution=node ./bin/upload-notion-images-to-cloudinary.cjs"
   },
   "engines": {
     "node": ">=16"
   },
-  "type": "module",
+  "type": "commonjs",
   "keywords": [
     "notion",
     "api",
@@ -19,7 +19,19 @@
     "script",
     "images"
   ],
-  "author": "Guillermo de la Puente",
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "repository": "https://github.com/guillermodlpa/upload-notion-images-to-cloudinary.git",
+  "author": {
+    "name": "Guillermo de la Puente",
+    "url": "https://guillermodlpa.com"
+  },
+  "sideEffects": false,
+  "bin": {
+    "upload-notion-images-to-cloudinary": "./bin/upload-notion-images-to-cloudinary.cjs"
+  },
   "license": "ISC",
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",

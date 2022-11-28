@@ -18,18 +18,28 @@ With this script, you can add images to Notion pages without worrying about wher
 
 This technology has been used for my website, build with Next.js and Notion. [https://github.com/guillermodlpa/site](https://github.com/guillermodlpa/site)
 
-## Usage
+## CLI usage
 
-1. Get a Notion API token for your account at https://www.notion.so/my-integrations, creating an integration with "read content" access, "update content" access, and "no user information" capabilities.
-1. Identify the ID of the Notion database that you want to go over. For that, open the database view on the browser, the URL is `https://www.notion.so/<database ID>?v=<view ID>`
-1. Obtain your Cloudinary API Environment Variable.
-1. Optionally, choose a folder within your Cloudinary account to upload images to. You can pass it later with `CLOUDINARY_UPLOAD_FOLDER`.
-1. Enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
-1. Install the package:
+1. Define the following environment variables in your project:
+
+      ```
+      NOTION_TOKEN=
+      NOTION_DATABASE_ID=
+      CLOUDINARY_URL=
+      CLOUDINARY_UPLOAD_FOLDER=
+      ```
+
+     * **NOTION_TOKEN** is obtained  at https://www.notion.so/my-integrations, creating an integration with "read content" access, "update content" access, and "no user information" capabilities.
+     * **NOTION_DATABASE_ID** is the ID of the Notion database that you want to go over. For that, open the database view on the browser, the URL is `https://www.notion.so/<database ID>?v=<view ID>`
+     * **CLOUDINARY_URL** can be obtained in the Cludinary UI.
+     * **CLOUDINARY_UPLOAD_FOLDER** is optional, defines a path within your Cloudinary account to upload images to.
+
+2. In Notion, enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
+3. Install the package:
     ```console
     $ npm install upload-notion-images-to-cloudinary
     ```
-1. Add it to the prebuild step, so it will get executed always before the production build is made:
+4. Add it to the prebuild step in your repository or in the deployment platform of your choice.
    ```json
     // package.json
     {
@@ -39,33 +49,12 @@ This technology has been used for my website, build with Next.js and Notion. [ht
     }
     ```
 
-### Usage during development
-
-Follow steps above 1 through 5, and then:
-
-1. Run installation of dependencies:
-    ```console
-    $ npm install
-    ```
-3. Compile the TypeScript source code:
-    ```console
-    $ npm run build
-    ```
-4. Execute the script passing the parameters as environment variables:
-    ```console
-    $ NOTION_TOKEN=[your token] \
-    NOTION_DATABASE_ID=[your DB ID] \
-    CLOUDINARY_URL=[your api env var] \
-    CLOUDINARY_UPLOAD_FOLDER=[folder to upload images to] \
-    npm run start
-    ```
-
 ### Example output
 
 ```
-[upload-notion-images-to-cloudinary][INFO] Fetching pages. Found 1
+[upload-notion-images-to-cloudinary][INFO] Fetching pages.... Found 1
 [upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: cover image not hosted in Notion
-[upload-notion-images-to-cloudinary][INFO] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: fetching image blocks. Found 2
+[upload-notion-images-to-cloudinary][INFO] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: fetching image blocks.... Found 2
 [upload-notion-images-to-cloudinary][INFO] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: image hosted in Notion. Image downloaded. Uploaded to Cloudinary. Updated in Notion ✅
 [upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: db95193f-44a4-4a66-97b8-6d2850d499ab: not hosted in Notion
 [upload-notion-images-to-cloudinary][DEBUG] 61b7aeb3-ea97-4ec6-b8c1-a762e8f0b711: 3f0104fb-e8aa-488f-a3b6-9ae8c2b7622b: not hosted in Notion
