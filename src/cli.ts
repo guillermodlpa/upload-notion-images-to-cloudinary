@@ -1,28 +1,39 @@
 import { BLOCK_TYPE_IMAGE } from "./constants/blockTypes";
 import * as cloudinaryClient from "./lib/cloudinaryClient";
-import {
-  fetchAllImageBlocks,
-  getPagesFromDatabase,
-  updateImageBlockExternalUrl,
-  updatePageCoverExternalUrl,
-} from "./lib/notionClient";
+import NotionClient from "./lib/notionClient";
 import downloadImageToBase64 from "./utils/downloadFile";
-import log from "./utils/log";
+import Logger from "./utils/Logger";
 import makeFilenameFromCaption from "./utils/makeFilenameFromCaption";
 import throwMissingEnvVarError from "./utils/throwMissingEnvVarError";
 
-export default async function run() {
-  const notionDatabaseId =
-    process.env.NOTION_DATABASE_ID ||
+export default async function uploadNotionImagesToCloudinary({
+  notionToken = process.env.NOTION_TOKEN || "",
+  notionDatabaseId = process.env.NOTION_DATABASE_ID || "",
+  cloudinaryUrl = process.env.CLOUDINARY_URL || "",
+  cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "",
+  logLevel = process.env.NODE_ENV === "development" ? "debug" : "error",
+}: {
+  notionToken: string;
+  notionDatabaseId: string;
+  cloudinaryUrl: string;
+  cloudinaryUploadFolder?: string;
+  logLevel: "none" | "error" | "info" | "debug";
+}) {
+  if (!notionToken) {
+    throwMissingEnvVarError("NOTION_TOKEN");
+  }
+  if (!notionDatabaseId) {
     throwMissingEnvVarError("NOTION_DATABASE_ID");
+  }
+  cloudinaryClient.config({ cloudinaryUrl });
 
-  const cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "";
+  const notionClient = new NotionClient(notionToken);
 
-  log.info(`Fetching pages`);
+  const log = new Logger(logLevel);
 
-  const pages = await getPagesFromDatabase(notionDatabaseId);
+  log.debug(`Fetching pages`);
 
-  log.appendSentence(`Found ${pages.length}`);
+  const pages = await notionClient.getPagesFromDatabase(notionDatabaseId);
 
   for (const page of pages) {
     const coverUrl =
@@ -36,7 +47,7 @@ export default async function run() {
       log.info(`${page.id}: cover image hosted in Notion`);
 
       const coverImage = await downloadImageToBase64(coverUrl);
-      log.appendSentence("Image downloaded");
+      log.debug("Image downloaded");
 
       const { url: coverExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${coverImage}`,
@@ -45,15 +56,17 @@ export default async function run() {
           // @todo: add filename here, pulling from the Notion API page title
         }
       );
-      log.appendSentence("Uploaded to Cloudinary");
+      log.debug("Uploaded to Cloudinary");
 
-      await updatePageCoverExternalUrl(page.id, coverExternalUrl);
-      log.appendSentence("Updated in Notion ✅");
+      await notionClient.updatePageCoverExternalUrl(page.id, coverExternalUrl);
+      log.info(
+        `${page.id}: cover image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
+      );
     }
 
-    log.info(`${page.id}: fetching image blocks...`);
-    const imageBlocks = await fetchAllImageBlocks(page.id);
-    log.appendSentence(`Found ${imageBlocks.length}`);
+    log.debug(`${page.id}: fetching image blocks...`);
+    const imageBlocks = await notionClient.fetchAllImageBlocks(page.id);
+    log.debug(`Found ${imageBlocks.length}`);
 
     for (const imageBlock of imageBlocks) {
       if (!(BLOCK_TYPE_IMAGE in imageBlock)) {
@@ -71,7 +84,7 @@ export default async function run() {
       log.info(`${page.id}: image hosted in Notion`);
 
       const blockImage = await downloadImageToBase64(imageUrl);
-      log.appendSentence("Image downloaded");
+      log.debug("Image downloaded");
 
       const { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${blockImage}`,
@@ -82,12 +95,17 @@ export default async function run() {
           ),
         }
       );
-      log.appendSentence("Uploaded to Cloudinary");
+      log.debug("Uploaded to Cloudinary");
 
-      await updateImageBlockExternalUrl(imageBlock.id, imageExternalUrl);
-      log.appendSentence("Updated in Notion ✅");
+      await notionClient.updateImageBlockExternalUrl(
+        imageBlock.id,
+        imageExternalUrl
+      );
+      log.info(
+        `${page.id}: ${imageBlock.id}: block image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
+      );
     }
   }
 
-  log.info("End");
+  log.debug("End");
 }
