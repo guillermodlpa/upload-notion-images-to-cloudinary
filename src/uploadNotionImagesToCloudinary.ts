@@ -4,26 +4,33 @@ import NotionClient from "./lib/notionClient";
 import downloadImageToBase64 from "./utils/downloadFile";
 import Logger from "./utils/Logger";
 import makeFilenameFromCaption from "./utils/makeFilenameFromCaption";
-import throwMissingEnvVarError from "./utils/throwMissingEnvVarError";
 
 export default async function uploadNotionImagesToCloudinary({
   notionToken = process.env.NOTION_TOKEN || "",
-  notionDatabaseId = process.env.NOTION_DATABASE_ID || "",
+  notionDatabaseId = process.env.NOTION_DATABASE_ID || undefined,
+  notionPageId = undefined,
   cloudinaryUrl = process.env.CLOUDINARY_URL || "",
   cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "",
   logLevel = process.env.NODE_ENV === "development" ? "debug" : "error",
 }: {
   notionToken: string;
-  notionDatabaseId: string;
+
   cloudinaryUrl: string;
   cloudinaryUploadFolder?: string;
   logLevel: "none" | "error" | "info" | "debug";
-}) {
+} & (
+  | { notionDatabaseId: string; notionPageId?: undefined }
+  | { notionDatabaseId?: undefined; notionPageId: string }
+)) {
   if (!notionToken) {
-    throwMissingEnvVarError("NOTION_TOKEN");
+    throw new Error(
+      `Missing argument notionToken. Pass it or set it as the env var NOTION_TOKEN`
+    );
   }
-  if (!notionDatabaseId) {
-    throwMissingEnvVarError("NOTION_DATABASE_ID");
+  if (!notionDatabaseId && !notionPageId) {
+    throw new Error(
+      `Missing both arguments notionDatabaseId and notionPageId. Pass one of them it or set the database ID in an env var NOTION_DATABASE_ID`
+    );
   }
   cloudinaryClient.config({ cloudinaryUrl });
 
@@ -31,9 +38,19 @@ export default async function uploadNotionImagesToCloudinary({
 
   const log = new Logger(logLevel);
 
-  log.debug(`Fetching pages`);
+  log.debug(
+    notionPageId
+      ? `Fetching page ${notionPageId}`
+      : notionDatabaseId
+      ? `Fetching pages of database ${notionDatabaseId}`
+      : "Missing page or database ID"
+  );
 
-  const pages = await notionClient.getPagesFromDatabase(notionDatabaseId);
+  const pages = notionPageId
+    ? [await notionClient.getPage(notionPageId)]
+    : notionDatabaseId
+    ? await notionClient.getPagesFromDatabase(notionDatabaseId)
+    : [];
 
   for (const page of pages) {
     const coverUrl =

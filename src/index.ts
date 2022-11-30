@@ -1,1 +1,1 @@
-export { default } from "./cli";
+export { default } from "./uploadNotionImagesToCloudinary";

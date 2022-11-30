@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 require("dotenv").config();
-const cli = require("../dist/cli.js");
-cli.default({ logLevel: "debug" });
+const uploadNotionImagesToCloudinary = require("../dist/uploadNotionImagesToCloudinary.js");
+uploadNotionImagesToCloudinary.default({ logLevel: "debug" });

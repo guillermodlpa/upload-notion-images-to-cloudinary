@@ -21,6 +21,13 @@ export default class NotionClient {
     return result.results;
   }
 
+  async getPage(notionPageId: string) {
+    const result = await this.#client.pages.retrieve({
+      page_id: notionPageId,
+    });
+    return result;
+  }
+
   async fetchAllBlocks(pageIdOrBlockId: string): Promise<GetBlockResponse[]> {
     const result = await this.#client.blocks.children.list({
       block_id: pageIdOrBlockId,

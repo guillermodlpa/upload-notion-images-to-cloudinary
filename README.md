@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/upload-notion-images-to-cloudinary.svg?style=flat-square)](https://www.npmjs.com/package/upload-notion-images-to-cloudinary)
 
-Script to move images in Notion to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API](https://cloudinary.com/documentation/node_image_and_video_upload).
+Script to move images hosted in Notion to Cloudinary, using the [Notion API](https://developers.notion.com/) and the [Cloudinary API.](https://cloudinary.com/documentation/node_image_and_video_upload)
 
 **⭐️ Contributions are welcome**. Read Contribute section below.
 
@@ -12,13 +12,43 @@ Because a site using Next.js leveraging Static Site Generation and Image Optimiz
 
 The Notion API returns temporary URLs for images hosted by Notion. The URLs will expire after one hour. This breaks [Next.js Image Optimization](https://nextjs.org/docs/basic-features/image-optimization) for Static Site Generated pages because after its internal image cache expires, it can't refetch from the URLs Notion provided at build time.
 
-The solution to use Next.js Image Optimization and Notion as a CMS is to host images in a separate service. However, uploading images to another service and then linking them from Notion is cumbersome.
+A solution to apply image optimization is to host images in a separate service. However, manually doing it is a lot of effort.
 
-With this script, you can add images to Notion pages without worrying about where they are hosted, and then before publishing, you can execute this script to move the files to Cloudinary, where they'll have a persistent URL that Next.js can use at any time.
+By hooking up this script to the page revalidation and deployment of the application, content creators can add images to Notion pages without worrying about where they are hosted.
 
 ### Example
 
 This technology has been used for my website, build with Next.js and Notion. [https://github.com/guillermodlpa/site](https://github.com/guillermodlpa/site)
+
+## Usage as a module
+
+Simply import it and call the function passing a Notion database ID:
+
+```typescript
+import uploadNotionImagesToCloudinary from 'upload-notion-images-to-cloudinary';
+
+await uploadNotionImagesToCloudinary({
+  notionToken: process.env.NOTION_TOKEN,
+  notionDatabaseId: process.env.NOTION_BLOG_DATABASE_ID,
+  cloudinaryUrl: process.env.CLOUDINARY_URL,
+  cloudinaryUploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER,
+  logLevel: "debug",
+});
+```
+
+Or pass a Notion page ID to only apply it to that page:
+
+```typescript
+import uploadNotionImagesToCloudinary from 'upload-notion-images-to-cloudinary';
+
+await uploadNotionImagesToCloudinary({
+  notionToken: process.env.NOTION_TOKEN,
+  notionPageId: id,
+  cloudinaryUrl: process.env.CLOUDINARY_URL,
+  cloudinaryUploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER,
+  logLevel: "debug",
+});
+```
 
 ## CLI usage
 
