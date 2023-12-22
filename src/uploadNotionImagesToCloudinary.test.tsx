@@ -66,7 +66,6 @@ describe("uploadNotionImagesToCloudinary", () => {
       notionPageId: "fake-notion-page-id",
     });
 
-    // 1 (cover image) + 2 (still hosted in notion) = 2
     expect(uploadImage).toHaveBeenCalledTimes(3);
   });
 });
