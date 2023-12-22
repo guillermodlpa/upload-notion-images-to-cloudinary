@@ -25,7 +25,7 @@ This technology has been used for my website, build with Next.js and Notion. [ht
 Simply import it and call the function passing a Notion database ID:
 
 ```typescript
-import uploadNotionImagesToCloudinary from 'upload-notion-images-to-cloudinary';
+import uploadNotionImagesToCloudinary from "upload-notion-images-to-cloudinary";
 
 await uploadNotionImagesToCloudinary({
   notionToken: process.env.NOTION_TOKEN,
@@ -39,7 +39,7 @@ await uploadNotionImagesToCloudinary({
 Or pass a Notion page ID to only apply it to that page:
 
 ```typescript
-import uploadNotionImagesToCloudinary from 'upload-notion-images-to-cloudinary';
+import uploadNotionImagesToCloudinary from "upload-notion-images-to-cloudinary";
 
 await uploadNotionImagesToCloudinary({
   notionToken: process.env.NOTION_TOKEN,
@@ -54,32 +54,34 @@ await uploadNotionImagesToCloudinary({
 
 1. Define the following environment variables in your project:
 
-      ```
-      NOTION_TOKEN=
-      NOTION_DATABASE_ID=
-      CLOUDINARY_URL=
-      CLOUDINARY_UPLOAD_FOLDER=
-      ```
+   ```
+   NOTION_TOKEN=
+   NOTION_DATABASE_ID=
+   CLOUDINARY_URL=
+   CLOUDINARY_UPLOAD_FOLDER=
+   USE_CLOUDINARY_OPTIMIZED_URL=
+   ```
 
-     * **NOTION_TOKEN** is obtained  at https://www.notion.so/my-integrations, creating an integration with "read content" access, "update content" access, and "no user information" capabilities.
-     * **NOTION_DATABASE_ID** is the ID of the Notion database that you want to go over. For that, open the database view on the browser, the URL is `https://www.notion.so/<database ID>?v=<view ID>`
-     * **CLOUDINARY_URL** can be obtained in the Cludinary UI.
-     * **CLOUDINARY_UPLOAD_FOLDER** is optional, defines a path within your Cloudinary account to upload images to.
+   - **NOTION_TOKEN** is obtained at https://www.notion.so/my-integrations, creating an integration with "read content" access, "update content" access, and "no user information" capabilities.
+   - **NOTION_DATABASE_ID** is the ID of the Notion database that you want to go over. For that, open the database view on the browser, the URL is `https://www.notion.so/<database ID>?v=<view ID>`
+   - **CLOUDINARY_URL** can be obtained in the Cludinary UI.
+   - **CLOUDINARY_UPLOAD_FOLDER** is optional, defines a path within your Cloudinary account to upload images to.
+   - **USE_CLOUDINARY_OPTIMIZED_URL** is optional (defaults to `false`), determines whether the path to the original image is used or the Cloudinary optimized URL using `f_auto,q_auto` options as defined by https://cloudinary.com/documentation/image_optimization#set_the_default_quality_for_your_product_environment.
 
 2. In Notion, enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
 3. Install the package:
-    ```console
-    $ npm install upload-notion-images-to-cloudinary
-    ```
+   ```console
+   $ npm install upload-notion-images-to-cloudinary
+   ```
 4. Add it to the prebuild step in your repository or in the deployment platform of your choice.
    ```json
-    // package.json
-    {
-      "scripts": {
-        "postbuild": "upload-notion-images-to-cloudinary"
-      },
-    }
-    ```
+   // package.json
+   {
+     "scripts": {
+       "postbuild": "upload-notion-images-to-cloudinary"
+     }
+   }
+   ```
 
 ### Example output
 
@@ -96,8 +98,9 @@ await uploadNotionImagesToCloudinary({
 ## Contribute
 
 ⭐️ Contributions are welcome. If this code can be useful to you, consider improving it and opening a pull request. There are things to be done, like:
-* Handling errors more gracefully
-* Supporting paginated results for large databases and pages
-* Using the page title for the cover image filename
-* Adding CI
-* Writing tests
+
+- Handling errors more gracefully
+- Supporting paginated results for large databases and pages
+- Using the page title for the cover image filename
+- Adding CI
+- Writing tests

@@ -11,12 +11,15 @@ export default async function uploadNotionImagesToCloudinary({
   notionPageId = undefined,
   cloudinaryUrl = process.env.CLOUDINARY_URL || "",
   cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "",
+  useCloudinaryOptimizedUrl = process.env.USE_CLOUDINARY_OPTIMIZED_URL ||
+    undefined,
   logLevel = process.env.NODE_ENV === "development" ? "debug" : "error",
 }: {
   notionToken: string;
 
   cloudinaryUrl: string;
   cloudinaryUploadFolder?: string;
+  useCloudinaryOptimizedUrl?: string;
   logLevel: "none" | "error" | "info" | "debug";
 } & (
   | { notionDatabaseId: string; notionPageId?: undefined }
@@ -103,7 +106,7 @@ export default async function uploadNotionImagesToCloudinary({
       const blockImage = await downloadImageToBase64(imageUrl);
       log.debug("Image downloaded");
 
-      const { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
+      let { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${blockImage}`,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
@@ -112,6 +115,16 @@ export default async function uploadNotionImagesToCloudinary({
           ),
         }
       );
+
+      if (useCloudinaryOptimizedUrl === "true") {
+        // Cloudinary optimized URL is of the form https://res.cloudinary.com/<id>/image/upload/f_auto,q_auto/v1/.../<image_id>
+        imageExternalUrl = imageExternalUrl
+          .replace("/upload/", "/upload/f_auto,q_auto/v1/")
+          .replace(/\.[^.]+$/, "");
+
+        log.debug("Replaced original asset URL with Cloudinary optimized URL");
+      }
+
       log.debug("Uploaded to Cloudinary");
 
       await notionClient.updateImageBlockExternalUrl(
