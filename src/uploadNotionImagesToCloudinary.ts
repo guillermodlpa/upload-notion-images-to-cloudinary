@@ -119,7 +119,7 @@ export default async function uploadNotionImagesToCloudinary({
       if (useCloudinaryOptimizedUrl === "true") {
         // Cloudinary optimized URL is of the form https://res.cloudinary.com/<id>/image/upload/f_auto,q_auto/v1/.../<image_id>
         imageExternalUrl = imageExternalUrl
-          .replace("/upload/", "/upload/f_auto,q_auto/v1/")
+          .replace(/\/upload\/([^\/]+)\//, "/upload/f_auto,q_auto/v1/")
           .replace(/\.[^.]+$/, "");
 
         log.debug("Replaced original asset URL with Cloudinary optimized URL");
