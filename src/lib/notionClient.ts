@@ -1,5 +1,9 @@
 import { Client, LogLevel } from "@notionhq/client";
-import {GetBlockResponse, ListBlockChildrenResponse} from "@notionhq/client/build/src/api-endpoints";
+import {
+  GetBlockResponse,
+  ListBlockChildrenResponse,
+  QueryDatabaseResponse
+} from "@notionhq/client/build/src/api-endpoints";
 import { BLOCK_TYPE_IMAGE } from "../constants/blockTypes";
 import Logger from "../utils/Logger";
 
@@ -17,16 +21,27 @@ export default class NotionClient {
   }
 
   async getPagesFromDatabase(notionDatabaseId: string) {
-    const result = await this.#client.databases.query({
-      database_id: notionDatabaseId,
-    });
-    // @todo: add pagination to handle databases with many pages
+    let hasMore = true;
+    let nextCursor: string | null = null;
+    const pages: any[] = [];
 
-    if (result.has_more) {
-      this.log.info('⚠️ More than 100 pages in database, pagination not implemented yet')
+    while (hasMore) {
+      const result: QueryDatabaseResponse = await this.#client.databases.query({
+        database_id: notionDatabaseId,
+        start_cursor: nextCursor || undefined,
+      });
+
+      pages.push(...result.results);
+
+      hasMore = result.has_more;
+      nextCursor = result.next_cursor;
+
+      if (hasMore) {
+        this.log.debug('⚠️ More than 100 pages in db, fetching more...')
+      }
     }
 
-    return result.results;
+    return pages
   }
 
   async getPage(notionPageId: string) {
