@@ -7,13 +7,13 @@ export default class Logger {
 
   debug(message: string, ...args: any[]) {
     if (this.level === "debug") {
-      console.log(`[upload-notion-images-to-cloudinary][DEBUG] ${message}`);
+      console.log(`[upload-notion-images-to-cloudinary][DEBUG] ${message}`, ...args);
     }
   }
 
   info(message: string, ...args: any[]) {
     if (this.level === "debug" || this.level === "info") {
-      console.log(`[upload-notion-images-to-cloudinary][INFO] ${message}`);
+      console.log(`[upload-notion-images-to-cloudinary][INFO] ${message}`, ...args);
     }
   }
 
