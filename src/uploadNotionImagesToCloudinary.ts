@@ -103,13 +103,16 @@ export default async function uploadNotionImagesToCloudinary({
       const blockImage = await downloadImageToBase64(imageUrl);
       log.debug("Image downloaded");
 
+      const filenameFromCaption = makeFilenameFromCaption(
+        imageBlock[BLOCK_TYPE_IMAGE].caption
+      )
+
       const { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${blockImage}`,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
-          public_id: `${makeFilenameFromCaption(
-            imageBlock[BLOCK_TYPE_IMAGE].caption
-          )}_${imageBlock.id}`,
+          // Cloudinary will set a filename if undefined (same as cover)
+          public_id: filenameFromCaption ? `${filenameFromCaption}_${imageBlock.id}` : undefined,
         }
       );
       log.debug("Uploaded to Cloudinary");
