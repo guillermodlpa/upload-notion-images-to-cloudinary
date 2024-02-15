@@ -4,6 +4,7 @@ import NotionClient from "./lib/notionClient";
 import downloadImageToBase64 from "./utils/downloadFile";
 import Logger from "./utils/Logger";
 import makeFilenameFromCaption from "./utils/makeFilenameFromCaption";
+import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export default async function uploadNotionImagesToCloudinary({
   notionToken = process.env.NOTION_TOKEN || "",
@@ -46,13 +47,27 @@ export default async function uploadNotionImagesToCloudinary({
       : "Missing page or database ID"
   );
 
-  const pages = notionPageId
+  const pages: GetPageResponse[] = notionPageId
     ? [await notionClient.getPage(notionPageId)]
     : notionDatabaseId
     ? await notionClient.getPagesFromDatabase(notionDatabaseId)
     : [];
 
   for (const page of pages) {
+    // find the title of the page in properties where the object.id is of type title
+    let title: string | undefined
+
+    if ("properties" in page) {
+      Object.entries(page.properties).some(([key, prop]) => {
+        if (prop && prop.type === "title") {
+          title = prop.title.map((t) => t.plain_text).join("")
+          return true
+        }
+      })
+    }
+
+    log.debug(`${page.id}: title: ${title}`)
+
     const coverUrl =
       "cover" in page && page.cover?.type === "file"
         ? page.cover.file.url
@@ -66,11 +81,13 @@ export default async function uploadNotionImagesToCloudinary({
       const coverImage = await downloadImageToBase64(coverUrl);
       log.debug("Image downloaded");
 
+      const filenameFromTitle = title ? makeFilenameFromCaption(title, 200) : undefined
+
       const { url: coverExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${coverImage}`,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
-          // @todo: add filename here, pulling from the Notion API page title
+          public_id: filenameFromTitle,
         }
       );
       log.debug("Uploaded to Cloudinary");
@@ -104,7 +121,8 @@ export default async function uploadNotionImagesToCloudinary({
       log.debug("Image downloaded");
 
       const filenameFromCaption = makeFilenameFromCaption(
-        imageBlock[BLOCK_TYPE_IMAGE].caption
+        imageBlock[BLOCK_TYPE_IMAGE].caption,
+        100
       )
 
       const { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
