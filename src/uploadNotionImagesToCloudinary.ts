@@ -34,9 +34,9 @@ export default async function uploadNotionImagesToCloudinary({
   }
   cloudinaryClient.config({ cloudinaryUrl });
 
-  const notionClient = new NotionClient(notionToken);
-
   const log = new Logger(logLevel);
+
+  const notionClient = new NotionClient(notionToken, log);
 
   log.debug(
     notionPageId
