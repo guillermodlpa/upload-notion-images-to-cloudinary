@@ -1,16 +1,19 @@
 import { Client, LogLevel } from "@notionhq/client";
 import { GetBlockResponse } from "@notionhq/client/build/src/api-endpoints";
 import { BLOCK_TYPE_IMAGE } from "../constants/blockTypes";
+import Logger from "../utils/Logger";
 
 export default class NotionClient {
   #client: Client;
+  log: Logger;
 
-  constructor(auth: string) {
+  constructor(auth: string, log: Logger) {
     this.#client = new Client({
       auth,
       logLevel:
         process.env.NODE_ENV === "development" ? LogLevel.DEBUG : LogLevel.WARN,
     });
+    this.log = log;
   }
 
   async getPagesFromDatabase(notionDatabaseId: string) {
@@ -18,6 +21,11 @@ export default class NotionClient {
       database_id: notionDatabaseId,
     });
     // @todo: add pagination to handle databases with many pages
+
+    if (result.results.length > 100) {
+      this.log.info('⚠️ More than 100 pages in database, pagination not implemented yet')
+    }
+
     return result.results;
   }
 
@@ -34,6 +42,10 @@ export default class NotionClient {
     });
     // @todo: add pagination to handle pages with many blocks
     const blocks = result.results;
+
+    if (result.results.length > 100) {
+      this.log.info('⚠️ More than 100 blocks in page, pagination not implemented yet')
+    }
 
     // Retrieve block children for nested blocks (one level deep), for example toggle blocks
     // https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
