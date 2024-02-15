@@ -107,9 +107,9 @@ export default async function uploadNotionImagesToCloudinary({
         `data:image/jpeg;base64,${blockImage}`,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
-          public_id: makeFilenameFromCaption(
+          public_id: `${makeFilenameFromCaption(
             imageBlock[BLOCK_TYPE_IMAGE].caption
-          ),
+          )}_${imageBlock.id}`,
         }
       );
       log.debug("Uploaded to Cloudinary");

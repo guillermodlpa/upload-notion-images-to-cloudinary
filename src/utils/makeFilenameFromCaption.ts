@@ -1,6 +1,13 @@
 /**
  * Turns a caption in a Notion image block into a filename
  * This is done for SEO, so the images can be discoverable more easily
+ *
+ * https://cloudinary.com/documentation/image_upload_api_reference
+ * public_id:
+ *   Can be up to 255 characters, including non-English characters, periods (.),
+ *   forward slashes (/), underscores (_), hyphens (-).
+ *   Public ID values cannot begin or end with a space or forward slash (/).
+ *   Additionally, they cannot include the following characters: ? & # \ % < > +
  */
 export default function makeFilenameFromCaption(
   caption: string | any[]
@@ -14,6 +21,11 @@ export default function makeFilenameFromCaption(
     .replace(/[\u0300-\u036f]/g, "");
   const filename = normalizedCaption
     .replace(/[^0-9a-z_-]/gi, "_")
-    .toLowerCase();
-  return filename;
+    .toLowerCase()
+    // max 50 characters
+    .substring(0, 50)
+    // remove trailing underscores
+    .replace(/_+$/, "");
+
+  return filename
 }
