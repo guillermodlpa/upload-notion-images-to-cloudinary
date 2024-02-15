@@ -22,7 +22,7 @@ export default class NotionClient {
     });
     // @todo: add pagination to handle databases with many pages
 
-    if (result.results.length > 100) {
+    if (result.has_more) {
       this.log.info('⚠️ More than 100 pages in database, pagination not implemented yet')
     }
 
@@ -43,7 +43,7 @@ export default class NotionClient {
     // @todo: add pagination to handle pages with many blocks
     const blocks = result.results;
 
-    if (result.results.length > 100) {
+    if (result.has_more) {
       this.log.info('⚠️ More than 100 blocks in page, pagination not implemented yet')
     }
 
