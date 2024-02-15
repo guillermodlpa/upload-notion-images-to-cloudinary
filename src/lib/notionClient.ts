@@ -1,5 +1,5 @@
 import { Client, LogLevel } from "@notionhq/client";
-import { GetBlockResponse } from "@notionhq/client/build/src/api-endpoints";
+import {GetBlockResponse, ListBlockChildrenResponse} from "@notionhq/client/build/src/api-endpoints";
 import { BLOCK_TYPE_IMAGE } from "../constants/blockTypes";
 import Logger from "../utils/Logger";
 
@@ -37,14 +37,24 @@ export default class NotionClient {
   }
 
   async fetchAllBlocks(pageIdOrBlockId: string): Promise<GetBlockResponse[]> {
-    const result = await this.#client.blocks.children.list({
-      block_id: pageIdOrBlockId,
-    });
-    // @todo: add pagination to handle pages with many blocks
-    const blocks = result.results;
+    let hasMore = true;
+    let nextCursor: string | null = null;
+    const blocks: GetBlockResponse[] = [];
 
-    if (result.has_more) {
-      this.log.info('⚠️ More than 100 blocks in page, pagination not implemented yet')
+    while (hasMore) {
+      const result: ListBlockChildrenResponse = await this.#client.blocks.children.list({
+        block_id: pageIdOrBlockId,
+        start_cursor: nextCursor || undefined,
+      });
+
+      blocks.push(...result.results);
+
+      hasMore = result.has_more;
+      nextCursor = result.next_cursor;
+
+      if (hasMore) {
+        this.log.debug('⚠️ More than 100 blocks in page, fetching more...')
+      }
     }
 
     // Retrieve block children for nested blocks (one level deep), for example toggle blocks
