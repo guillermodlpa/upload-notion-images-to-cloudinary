@@ -13,12 +13,13 @@ export default async function uploadNotionImagesToCloudinary({
   cloudinaryUrl = process.env.CLOUDINARY_URL || "",
   cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "",
   logLevel = process.env.NODE_ENV === "development" ? "debug" : "error",
+  uploadExternalsNotOnCloudinary = false,
 }: {
   notionToken: string;
-
   cloudinaryUrl: string;
   cloudinaryUploadFolder?: string;
   logLevel: "none" | "error" | "info" | "debug";
+  uploadExternalsNotOnCloudinary?: boolean;
 } & (
   | { notionDatabaseId: string; notionPageId?: undefined }
   | { notionDatabaseId?: undefined; notionPageId: string }
@@ -71,10 +72,21 @@ export default async function uploadNotionImagesToCloudinary({
     ////////////////////
     // cover
     ////////////////////
-    const coverUrl =
+    let coverUrl =
       "cover" in page && page.cover?.type === "file"
         ? page.cover.file.url
         : undefined;
+
+    // case if external image is not stored on cloudinary
+    if (
+      uploadExternalsNotOnCloudinary &&
+      "cover" in page &&
+      page.cover?.type === "external" &&
+      !page.cover.external.url.includes("cloudinary")
+    ) {
+      log.debug(`${page.id}: coverUrl not on cloudinary`, page.cover.external)
+      coverUrl = page.cover.external.url
+    }
 
     if (!coverUrl) {
       log.debug(`${page.id}: cover image already not hosted in Notion`);
@@ -104,10 +116,22 @@ export default async function uploadNotionImagesToCloudinary({
     ////////////////////
     // icon
     ////////////////////
-    const iconUrl =
+    let iconUrl =
       "icon" in page && page.icon?.type === "file"
         ? page.icon.file.url
         : undefined
+
+    // case if external image is not stored on cloudinary
+    if (
+      uploadExternalsNotOnCloudinary &&
+      "icon" in page &&
+      page.icon?.type === "external" &&
+      !page.icon.external.url.includes("cloudinary") &&
+      page.icon.external.url.startsWith("http") // ignore url: "data:image/png;base64,iVBORw...
+    ) {
+      log.debug(`${page.id}: iconUrl not on cloudinary`, page.icon.external)
+      iconUrl = page.icon.external.url
+    }
 
     if (!iconUrl) {
       log.debug(`${page.id}: icon image already not hosted in Notion`)
@@ -146,10 +170,21 @@ export default async function uploadNotionImagesToCloudinary({
         log.error("Unexpected image block without value property");
         continue;
       }
-      const imageUrl =
+      let imageUrl =
         imageBlock[BLOCK_TYPE_IMAGE].type === "file"
           ? imageBlock[BLOCK_TYPE_IMAGE].file.url
           : null;
+
+      // case if external image is not stored on cloudinary
+      if (
+        uploadExternalsNotOnCloudinary &&
+        imageBlock[BLOCK_TYPE_IMAGE].type === "external" &&
+        !imageBlock[BLOCK_TYPE_IMAGE].external.url.includes("cloudinary")
+      ) {
+        log.debug(`${page.id}: imageBlock not on cloudinary`, imageBlock[BLOCK_TYPE_IMAGE].external)
+        imageUrl = imageBlock[BLOCK_TYPE_IMAGE].external.url
+      }
+
       if (!imageUrl) {
         log.debug(`${page.id}: ${imageBlock.id}: already not hosted in Notion`);
         continue;
