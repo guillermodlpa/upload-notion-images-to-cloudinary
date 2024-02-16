@@ -119,4 +119,16 @@ export default class NotionClient {
       },
     });
   }
+
+  async updatePageIconExternalUrl(pageId: string, url: string) {
+    return this.#client.pages.update({
+      page_id: pageId,
+      icon: {
+        type: "external",
+        external: {
+          url,
+        },
+      },
+    })
+  }
 }
