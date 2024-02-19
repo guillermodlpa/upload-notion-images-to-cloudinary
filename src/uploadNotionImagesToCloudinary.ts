@@ -126,8 +126,7 @@ export default async function uploadNotionImagesToCloudinary({
       uploadExternalsNotOnCloudinary &&
       "icon" in page &&
       page.icon?.type === "external" &&
-      !page.icon.external.url.includes("cloudinary") &&
-      page.icon.external.url.startsWith("http") // ignore url: "data:image/png;base64,iVBORw...
+      !page.icon.external.url.includes("cloudinary")
     ) {
       log.debug(`${page.id}: iconUrl not on cloudinary`, page.icon.external)
       iconUrl = page.icon.external.url
@@ -138,13 +137,22 @@ export default async function uploadNotionImagesToCloudinary({
     } else {
       log.info(`${page.id}: icon image hosted in Notion`)
 
-      const iconImage = await downloadImageToBase64(iconUrl)
-      log.debug("Image downloaded")
+
+      let image
+
+      // check if the icon is a data url
+      if (iconUrl.startsWith("data:image")) {
+        image = iconUrl
+      } else {
+        const iconImage = await downloadImageToBase64(iconUrl)
+        log.debug("Image downloaded")
+        image = `data:image/jpeg;base64,${iconImage}`
+      }
 
       const filenameFromTitle = title ? `${makeFilename(title, 150)}_icon` : undefined
 
       const { url: iconExternalUrl } = await cloudinaryClient.uploadImage(
-        `data:image/jpeg;base64,${iconImage}`,
+        image,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
           public_id: filenameFromTitle,
