@@ -11,26 +11,22 @@
  */
 export default function makeFilename(
   caption: string | Record<'plain_text', string>[],
-  maxLength = 50
+  maxLength = 50,
 ): string | undefined {
-  maxLength = maxLength > 255 ? 255 : maxLength
+  maxLength = maxLength > 255 ? 255 : maxLength;
 
   const plainText =
-    typeof caption === "string"
-      ? caption
-      : caption.map((content) => content.plain_text).join("");
-  const normalizedCaption = plainText
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    typeof caption === 'string' ? caption : caption.map((content) => content.plain_text).join('');
+  const normalizedCaption = plainText.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const filename = normalizedCaption
-    .replace(/[^0-9a-z_-]/gi, "_")
+    .replace(/[^0-9a-z_-]/gi, '_')
     .toLowerCase()
     // max characters
     .substring(0, maxLength)
     // remove trailing underscores
-    .replace(/_+$/, "")
+    .replace(/_+$/, '')
     // remove multiple underscores
-    .replace(/_{2,}/g, "_");
+    .replace(/_{2,}/g, '_');
 
-  return filename
+  return filename;
 }

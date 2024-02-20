@@ -1,12 +1,12 @@
-import { Client, LogLevel } from "@notionhq/client";
+import { Client, LogLevel } from '@notionhq/client';
 import {
   GetBlockResponse,
   GetPageResponse,
   ListBlockChildrenResponse,
-  QueryDatabaseResponse
-} from "@notionhq/client/build/src/api-endpoints";
-import { BLOCK_TYPE_IMAGE } from "../constants/blockTypes";
-import Logger from "../utils/Logger";
+  QueryDatabaseResponse,
+} from '@notionhq/client/build/src/api-endpoints';
+import { BLOCK_TYPE_IMAGE } from '../constants/blockTypes';
+import Logger from '../utils/Logger';
 
 export default class NotionClient {
   #client: Client;
@@ -15,8 +15,7 @@ export default class NotionClient {
   constructor(auth: string, log: Logger) {
     this.#client = new Client({
       auth,
-      logLevel:
-        process.env.NODE_ENV === "development" ? LogLevel.DEBUG : LogLevel.WARN,
+      logLevel: process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.WARN,
     });
     this.log = log;
   }
@@ -32,17 +31,17 @@ export default class NotionClient {
         start_cursor: nextCursor || undefined,
       });
 
-      pages.push(...(result.results as GetPageResponse[]))
+      pages.push(...(result.results as GetPageResponse[]));
 
       hasMore = result.has_more;
       nextCursor = result.next_cursor;
 
       if (hasMore) {
-        this.log.debug('⚠️ More than 100 pages in db, fetching more...')
+        this.log.debug('⚠️ More than 100 pages in db, fetching more...');
       }
     }
 
-    return pages
+    return pages;
   }
 
   async getPage(notionPageId: string): Promise<GetPageResponse> {
@@ -69,7 +68,7 @@ export default class NotionClient {
       nextCursor = result.next_cursor;
 
       if (hasMore) {
-        this.log.debug('⚠️ More than 100 blocks in page, fetching more...')
+        this.log.debug('⚠️ More than 100 blocks in page, fetching more...');
       }
     }
 
@@ -77,23 +76,21 @@ export default class NotionClient {
     // https://developers.notion.com/docs/working-with-page-content#reading-nested-blocks
     const childBlocks = await Promise.all(
       blocks
-        .filter((block) => "has_children" in block && block.has_children)
+        .filter((block) => 'has_children' in block && block.has_children)
         .map(async (block) => {
           const childBlocks = await this.fetchAllBlocks(block.id);
           return childBlocks;
-        })
+        }),
     );
 
     // We don't care about the order they are. Otherwise, we'd group child blocks with their parents
     return [...blocks, ...childBlocks.flat()];
   }
 
-  async fetchAllImageBlocks(
-    pageIdOrBlockId: string
-  ): Promise<GetBlockResponse[]> {
+  async fetchAllImageBlocks(pageIdOrBlockId: string): Promise<GetBlockResponse[]> {
     const allBlocks = await this.fetchAllBlocks(pageIdOrBlockId);
     const imageBlocks = allBlocks.filter(
-      (block) => "type" in block && block.type === BLOCK_TYPE_IMAGE
+      (block) => 'type' in block && block.type === BLOCK_TYPE_IMAGE,
     );
     return imageBlocks;
   }
@@ -113,7 +110,7 @@ export default class NotionClient {
     return this.#client.pages.update({
       page_id: pageId,
       cover: {
-        type: "external",
+        type: 'external',
         external: {
           url,
         },
@@ -125,11 +122,11 @@ export default class NotionClient {
     return this.#client.pages.update({
       page_id: pageId,
       icon: {
-        type: "external",
+        type: 'external',
         external: {
           url,
         },
       },
-    })
+    });
   }
 }
