@@ -77,12 +77,14 @@ await uploadNotionImagesToCloudinary({
       NOTION_DATABASE_ID=
       CLOUDINARY_URL=
       CLOUDINARY_UPLOAD_FOLDER=
+      UPLOAD_EXTERNALS_NOT_ON_CLOUDINARY=
       ```
 
      * **NOTION_TOKEN** is obtained  at https://www.notion.so/my-integrations, creating an integration with "read content" access, "update content" access, and "no user information" capabilities.
      * **NOTION_DATABASE_ID** is the ID of the Notion database that you want to go over. For that, open the database view on the browser, the URL is `https://www.notion.so/<database ID>?v=<view ID>`
      * **CLOUDINARY_URL** can be obtained in the Cludinary UI.
      * **CLOUDINARY_UPLOAD_FOLDER** is optional, defines a path within your Cloudinary account to upload images to.
+     * **UPLOAD_EXTERNALS_NOT_ON_CLOUDINARY** is optional, to also copy to Cloudinary any other external images.
 
 2. In Notion, enable the integration to manipulate the database, by clicking Share on its page and entering your integration name.
 3. Install the package:
