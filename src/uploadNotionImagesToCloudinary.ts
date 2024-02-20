@@ -5,7 +5,6 @@ import downloadImageToBase64 from "./utils/downloadFile";
 import Logger from "./utils/Logger";
 import makeFilename from "./utils/makeFilename";
 import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
-import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
 
 export default async function uploadNotionImagesToCloudinary({
   notionToken = process.env.NOTION_TOKEN || "",
