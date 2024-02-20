@@ -9,9 +9,12 @@
  *   Public ID values cannot begin or end with a space or forward slash (/).
  *   Additionally, they cannot include the following characters: ? & # \ % < > +
  */
-export default function makeFilenameFromCaption(
-  caption: string | any[]
+export default function makeFilename(
+  caption: string | Record<'plain_text', string>[],
+  maxLength = 50
 ): string | undefined {
+  maxLength = maxLength > 255 ? 255 : maxLength
+
   const plainText =
     typeof caption === "string"
       ? caption
@@ -22,8 +25,8 @@ export default function makeFilenameFromCaption(
   const filename = normalizedCaption
     .replace(/[^0-9a-z_-]/gi, "_")
     .toLowerCase()
-    // max 50 characters
-    .substring(0, 50)
+    // max characters
+    .substring(0, maxLength)
     // remove trailing underscores
     .replace(/_+$/, "");
 

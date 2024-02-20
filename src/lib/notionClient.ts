@@ -1,6 +1,7 @@
 import { Client, LogLevel } from "@notionhq/client";
 import {
   GetBlockResponse,
+  GetPageResponse,
   ListBlockChildrenResponse,
   QueryDatabaseResponse
 } from "@notionhq/client/build/src/api-endpoints";
@@ -20,10 +21,10 @@ export default class NotionClient {
     this.log = log;
   }
 
-  async getPagesFromDatabase(notionDatabaseId: string) {
+  async getPagesFromDatabase(notionDatabaseId: string): Promise<GetPageResponse[]> {
     let hasMore = true;
     let nextCursor: string | null = null;
-    const pages: any[] = [];
+    const pages: GetPageResponse[] = [];
 
     while (hasMore) {
       const result: QueryDatabaseResponse = await this.#client.databases.query({
@@ -31,7 +32,7 @@ export default class NotionClient {
         start_cursor: nextCursor || undefined,
       });
 
-      pages.push(...result.results);
+      pages.push(...(result.results as GetPageResponse[]))
 
       hasMore = result.has_more;
       nextCursor = result.next_cursor;
@@ -44,7 +45,7 @@ export default class NotionClient {
     return pages
   }
 
-  async getPage(notionPageId: string) {
+  async getPage(notionPageId: string): Promise<GetPageResponse> {
     const result = await this.#client.pages.retrieve({
       page_id: notionPageId,
     });
@@ -118,5 +119,17 @@ export default class NotionClient {
         },
       },
     });
+  }
+
+  async updatePageIconExternalUrl(pageId: string, url: string) {
+    return this.#client.pages.update({
+      page_id: pageId,
+      icon: {
+        type: "external",
+        external: {
+          url,
+        },
+      },
+    })
   }
 }
