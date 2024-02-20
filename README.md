@@ -50,6 +50,24 @@ await uploadNotionImagesToCloudinary({
 });
 ```
 
+Also upload external images that are not hosted on Cloudinary yet.\
+e.g. when you enter a URL directly in Notion from another webpage, and you want to persist it on your side.
+
+Pass parameter `uploadExternalsNotOnCloudinary: true` to enable it:
+
+```typescript
+import uploadNotionImagesToCloudinary from 'upload-notion-images-to-cloudinary';
+
+await uploadNotionImagesToCloudinary({
+  notionToken: process.env.NOTION_TOKEN,
+  notionDatabaseId: process.env.NOTION_BLOG_DATABASE_ID,
+  cloudinaryUrl: process.env.CLOUDINARY_URL,
+  cloudinaryUploadFolder: process.env.CLOUDINARY_UPLOAD_FOLDER,
+  logLevel: "debug",
+  uploadExternalsNotOnCloudinary: true,
+});
+```
+
 ## CLI usage
 
 1. Define the following environment variables in your project:
