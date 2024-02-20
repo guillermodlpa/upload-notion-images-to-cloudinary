@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^2.2.14",
-    "cloudinary": "^1.41.3",
+    "cloudinary": "^2.0.1",
     "dotenv": "^16.4.5"
   }
 }
