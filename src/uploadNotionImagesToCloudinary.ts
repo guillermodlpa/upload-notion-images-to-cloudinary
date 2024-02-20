@@ -2,6 +2,7 @@ import { BLOCK_TYPE_IMAGE } from "./constants/blockTypes";
 import * as cloudinaryClient from "./lib/cloudinaryClient";
 import NotionClient from "./lib/notionClient";
 import downloadImageToBase64 from "./utils/downloadFile";
+import getImageUrlToUploadFromNotionImageDescriptor from "./utils/getImageUrlToUploadFromNotionImageDescriptor";
 import Logger from "./utils/Logger";
 import makeFilename from "./utils/makeFilename";
 import { GetPageResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -37,9 +38,12 @@ export default async function uploadNotionImagesToCloudinary({
       `Missing both arguments notionDatabaseId and notionPageId. Pass one of them it or set the database ID in an env var NOTION_DATABASE_ID`
     );
   }
+
   cloudinaryClient.config({ cloudinaryUrl });
 
   const log = new Logger(logLevel);
+
+  log.debug(`Params`, { uploadExternalsNotOnCloudinary });
 
   const notionClient = new NotionClient(notionToken, log);
 
@@ -75,26 +79,15 @@ export default async function uploadNotionImagesToCloudinary({
     ////////////////////
     // cover
     ////////////////////
-    let coverUrl =
-      "cover" in page && page.cover?.type === "file"
-        ? page.cover.file.url
-        : undefined;
-
-    // case if external image is not stored on cloudinary
-    if (
-      uploadExternalsNotOnCloudinary &&
-      "cover" in page &&
-      page.cover?.type === "external" &&
-      !page.cover.external.url.includes("cloudinary")
-    ) {
-      log.debug(`${page.id}: coverUrl not on cloudinary`, page.cover.external);
-      coverUrl = page.cover.external.url;
-    }
+    const coverUrl = getImageUrlToUploadFromNotionImageDescriptor({
+      image: "cover" in page ? page.cover : undefined,
+      uploadExternalsNotOnCloudinary,
+    });
 
     if (!coverUrl) {
-      log.debug(`${page.id}: cover image already not hosted in Notion`);
+      log.debug(`${page.id}: cover image is already good ✔`);
     } else {
-      log.info(`${page.id}: cover image hosted in Notion`);
+      log.info(`${page.id}: uploading cover image to Cloudinary`);
 
       const coverImage = await downloadImageToBase64(coverUrl);
       log.debug("Image downloaded");
@@ -108,37 +101,26 @@ export default async function uploadNotionImagesToCloudinary({
           public_id: filenameFromTitle,
         }
       );
-      log.debug("Uploaded to Cloudinary");
+      log.debug("Cover image uploaded to Cloudinary");
 
       await notionClient.updatePageCoverExternalUrl(page.id, coverExternalUrl);
       log.info(
-        `${page.id}: cover image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
+        `${page.id}: cover image copied to Cloudinary and asset updated in Notion ✅`
       );
     }
 
     ////////////////////
     // icon
     ////////////////////
-    let iconUrl =
-      "icon" in page && page.icon?.type === "file"
-        ? page.icon.file.url
-        : undefined;
-
-    // case if external image is not stored on cloudinary
-    if (
-      uploadExternalsNotOnCloudinary &&
-      "icon" in page &&
-      page.icon?.type === "external" &&
-      !page.icon.external.url.includes("cloudinary")
-    ) {
-      log.debug(`${page.id}: iconUrl not on cloudinary`, page.icon.external);
-      iconUrl = page.icon.external.url;
-    }
+    const iconUrl = getImageUrlToUploadFromNotionImageDescriptor({
+      image: "icon" in page ? page.icon : undefined,
+      uploadExternalsNotOnCloudinary,
+    });
 
     if (!iconUrl) {
-      log.debug(`${page.id}: icon image already not hosted in Notion`);
+      log.debug(`${page.id}: icon image is already good ✔`);
     } else {
-      log.info(`${page.id}: icon image hosted in Notion`);
+      log.info(`${page.id}: uploading icon image to Cloudinary`);
 
       let image;
 
@@ -162,11 +144,11 @@ export default async function uploadNotionImagesToCloudinary({
           public_id: filenameFromTitle,
         }
       );
-      log.debug("Uploaded to Cloudinary");
+      log.debug("Icon image uploaded to Cloudinary");
 
       await notionClient.updatePageIconExternalUrl(page.id, iconExternalUrl);
       log.info(
-        `${page.id}: icon image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
+        `${page.id}: icon image copied to Cloudinary and asset updated in Notion ✅`
       );
     }
 
@@ -182,29 +164,17 @@ export default async function uploadNotionImagesToCloudinary({
         log.error("Unexpected image block without value property");
         continue;
       }
-      let imageUrl =
-        imageBlock[BLOCK_TYPE_IMAGE].type === "file"
-          ? imageBlock[BLOCK_TYPE_IMAGE].file.url
-          : null;
 
-      // case if external image is not stored on cloudinary
-      if (
-        uploadExternalsNotOnCloudinary &&
-        imageBlock[BLOCK_TYPE_IMAGE].type === "external" &&
-        !imageBlock[BLOCK_TYPE_IMAGE].external.url.includes("cloudinary")
-      ) {
-        log.debug(
-          `${page.id}: imageBlock not on cloudinary`,
-          imageBlock[BLOCK_TYPE_IMAGE].external
-        );
-        imageUrl = imageBlock[BLOCK_TYPE_IMAGE].external.url;
-      }
+      const imageUrl = getImageUrlToUploadFromNotionImageDescriptor({
+        image: imageBlock[BLOCK_TYPE_IMAGE],
+        uploadExternalsNotOnCloudinary,
+      });
 
       if (!imageUrl) {
-        log.debug(`${page.id}: ${imageBlock.id}: already not hosted in Notion`);
+        log.debug(`${page.id}: ${imageBlock.id}: block image already good ✔`);
         continue;
       }
-      log.info(`${page.id}: image hosted in Notion`);
+      log.info(`${page.id}: uploading block image to Cloudinary`);
 
       const blockImage = await downloadImageToBase64(imageUrl);
       log.debug("Image downloaded");
@@ -224,14 +194,14 @@ export default async function uploadNotionImagesToCloudinary({
             : undefined,
         }
       );
-      log.debug("Uploaded to Cloudinary");
+      log.debug("Block image uploaded to Cloudinary");
 
       await notionClient.updateImageBlockExternalUrl(
         imageBlock.id,
         imageExternalUrl
       );
       log.info(
-        `${page.id}: ${imageBlock.id}: block image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
+        `${page.id}: ${imageBlock.id}: block image copied to Cloudinary and asset updated in Notion ✅`
       );
     }
   }
