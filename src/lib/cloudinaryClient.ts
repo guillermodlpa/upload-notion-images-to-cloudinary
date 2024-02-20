@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary } from 'cloudinary';
 
 export async function config({
   cloudinaryUrl,
@@ -6,12 +6,9 @@ export async function config({
   // cloudinary://API_KEY:API_SECRET@CLOUD_NAME
   cloudinaryUrl: string;
 }) {
-  const urlRegex =
-    /^cloudinary:\/\/([a-z0-9-_]+):([a-z0-9-_]+)@([a-z0-9-_]+)$/i;
+  const urlRegex = /^cloudinary:\/\/([a-z0-9-_]+):([a-z0-9-_]+)@([a-z0-9-_]+)$/i;
   if (!urlRegex.test(cloudinaryUrl)) {
-    throw new Error(
-      `Invalid Cloudinary URL provided. It should match ${urlRegex.toString()}`
-    );
+    throw new Error(`Invalid Cloudinary URL provided. It should match ${urlRegex.toString()}`);
   }
   const [, apiKey, apiSecret, cloudName] = cloudinaryUrl.match(urlRegex) || [];
   cloudinary.config({
@@ -22,10 +19,7 @@ export async function config({
   });
 }
 
-export async function uploadImage(
-  image: string,
-  options = {}
-): Promise<{ url: string }> {
+export async function uploadImage(image: string, options = {}): Promise<{ url: string }> {
   return cloudinary.uploader
     .upload(image, options)
     .then((result) => ({
@@ -33,6 +27,6 @@ export async function uploadImage(
     }))
     .catch((error) => {
       console.error(error);
-      return { url: "" };
+      return { url: '' };
     });
 }

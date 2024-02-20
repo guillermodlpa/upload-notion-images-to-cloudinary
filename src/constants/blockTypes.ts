@@ -1,1 +1,1 @@
-export const BLOCK_TYPE_IMAGE = "image";
+export const BLOCK_TYPE_IMAGE = 'image';

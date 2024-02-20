@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node --experimental-modules --es-module-specifier-resolution=node ./bin/upload-notion-images-to-cloudinary.cjs"
+    "start": "node --experimental-modules --es-module-specifier-resolution=node ./bin/upload-notion-images-to-cloudinary.cjs",
+    "lint": "eslint . --ext .js --ext .ts"
   },
   "engines": {
     "node": ">=16"
@@ -38,6 +39,11 @@
     "@tsconfig/node16": "^16.1.1",
     "@tsconfig/node18": "^18.2.2",
     "@tsconfig/recommended": "^1.0.3",
+    "@typescript-eslint/eslint-plugin": "^7.0.2",
+    "@typescript-eslint/parser": "^7.0.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },
   "dependencies": {
