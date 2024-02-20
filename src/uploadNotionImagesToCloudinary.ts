@@ -13,7 +13,10 @@ export default async function uploadNotionImagesToCloudinary({
   cloudinaryUrl = process.env.CLOUDINARY_URL || "",
   cloudinaryUploadFolder = process.env.CLOUDINARY_UPLOAD_FOLDER || "",
   logLevel = process.env.NODE_ENV === "development" ? "debug" : "error",
-  uploadExternalsNotOnCloudinary = false,
+  uploadExternalsNotOnCloudinary = process.env
+    .UPLOAD_EXTERNALS_NOT_ON_CLOUDINARY
+    ? process.env.UPLOAD_EXTERNALS_NOT_ON_CLOUDINARY === "1"
+    : false,
 }: {
   notionToken: string;
   cloudinaryUrl: string;
@@ -56,18 +59,18 @@ export default async function uploadNotionImagesToCloudinary({
 
   for (const page of pages) {
     // find the title of the page in properties where the object.id is of type title
-    let title: string | undefined
+    let title: string | undefined;
 
     if ("properties" in page) {
       Object.entries(page.properties).some(([key, prop]) => {
         if (prop && prop.type === "title") {
-          title = prop.title.map((t) => t.plain_text).join("")
-          return true
+          title = prop.title.map((t) => t.plain_text).join("");
+          return true;
         }
-      })
+      });
     }
 
-    log.debug(`${page.id}: title: ${title}`)
+    log.debug(`${page.id}: title: ${title}`);
 
     ////////////////////
     // cover
@@ -84,8 +87,8 @@ export default async function uploadNotionImagesToCloudinary({
       page.cover?.type === "external" &&
       !page.cover.external.url.includes("cloudinary")
     ) {
-      log.debug(`${page.id}: coverUrl not on cloudinary`, page.cover.external)
-      coverUrl = page.cover.external.url
+      log.debug(`${page.id}: coverUrl not on cloudinary`, page.cover.external);
+      coverUrl = page.cover.external.url;
     }
 
     if (!coverUrl) {
@@ -96,7 +99,7 @@ export default async function uploadNotionImagesToCloudinary({
       const coverImage = await downloadImageToBase64(coverUrl);
       log.debug("Image downloaded");
 
-      const filenameFromTitle = title ? makeFilename(title, 200) : undefined
+      const filenameFromTitle = title ? makeFilename(title, 200) : undefined;
 
       const { url: coverExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${coverImage}`,
@@ -119,7 +122,7 @@ export default async function uploadNotionImagesToCloudinary({
     let iconUrl =
       "icon" in page && page.icon?.type === "file"
         ? page.icon.file.url
-        : undefined
+        : undefined;
 
     // case if external image is not stored on cloudinary
     if (
@@ -128,28 +131,29 @@ export default async function uploadNotionImagesToCloudinary({
       page.icon?.type === "external" &&
       !page.icon.external.url.includes("cloudinary")
     ) {
-      log.debug(`${page.id}: iconUrl not on cloudinary`, page.icon.external)
-      iconUrl = page.icon.external.url
+      log.debug(`${page.id}: iconUrl not on cloudinary`, page.icon.external);
+      iconUrl = page.icon.external.url;
     }
 
     if (!iconUrl) {
-      log.debug(`${page.id}: icon image already not hosted in Notion`)
+      log.debug(`${page.id}: icon image already not hosted in Notion`);
     } else {
-      log.info(`${page.id}: icon image hosted in Notion`)
+      log.info(`${page.id}: icon image hosted in Notion`);
 
-
-      let image
+      let image;
 
       // check if the icon is a data url
       if (iconUrl.startsWith("data:image")) {
-        image = iconUrl
+        image = iconUrl;
       } else {
-        const iconImage = await downloadImageToBase64(iconUrl)
-        log.debug("Image downloaded")
-        image = `data:image/jpeg;base64,${iconImage}`
+        const iconImage = await downloadImageToBase64(iconUrl);
+        log.debug("Image downloaded");
+        image = `data:image/jpeg;base64,${iconImage}`;
       }
 
-      const filenameFromTitle = title ? `${makeFilename(title, 150)}_icon` : undefined
+      const filenameFromTitle = title
+        ? `${makeFilename(title, 150)}_icon`
+        : undefined;
 
       const { url: iconExternalUrl } = await cloudinaryClient.uploadImage(
         image,
@@ -157,13 +161,13 @@ export default async function uploadNotionImagesToCloudinary({
           folder: `${cloudinaryUploadFolder}/${page.id}`,
           public_id: filenameFromTitle,
         }
-      )
-      log.debug("Uploaded to Cloudinary")
+      );
+      log.debug("Uploaded to Cloudinary");
 
-      await notionClient.updatePageIconExternalUrl(page.id, iconExternalUrl)
+      await notionClient.updatePageIconExternalUrl(page.id, iconExternalUrl);
       log.info(
         `${page.id}: icon image was hosted in Notion. Moved to Cloudinary and asset updated in Notion`
-      )
+      );
     }
 
     ////////////////////
@@ -189,8 +193,11 @@ export default async function uploadNotionImagesToCloudinary({
         imageBlock[BLOCK_TYPE_IMAGE].type === "external" &&
         !imageBlock[BLOCK_TYPE_IMAGE].external.url.includes("cloudinary")
       ) {
-        log.debug(`${page.id}: imageBlock not on cloudinary`, imageBlock[BLOCK_TYPE_IMAGE].external)
-        imageUrl = imageBlock[BLOCK_TYPE_IMAGE].external.url
+        log.debug(
+          `${page.id}: imageBlock not on cloudinary`,
+          imageBlock[BLOCK_TYPE_IMAGE].external
+        );
+        imageUrl = imageBlock[BLOCK_TYPE_IMAGE].external.url;
       }
 
       if (!imageUrl) {
@@ -205,14 +212,16 @@ export default async function uploadNotionImagesToCloudinary({
       const filenameFromCaption = makeFilename(
         imageBlock[BLOCK_TYPE_IMAGE].caption,
         100
-      )
+      );
 
       const { url: imageExternalUrl } = await cloudinaryClient.uploadImage(
         `data:image/jpeg;base64,${blockImage}`,
         {
           folder: `${cloudinaryUploadFolder}/${page.id}`,
           // Cloudinary will set a filename if undefined (same as cover)
-          public_id: filenameFromCaption ? `${filenameFromCaption}_${imageBlock.id}` : undefined,
+          public_id: filenameFromCaption
+            ? `${filenameFromCaption}_${imageBlock.id}`
+            : undefined,
         }
       );
       log.debug("Uploaded to Cloudinary");
