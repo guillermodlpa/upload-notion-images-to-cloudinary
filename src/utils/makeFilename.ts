@@ -9,7 +9,7 @@
  *   Public ID values cannot begin or end with a space or forward slash (/).
  *   Additionally, they cannot include the following characters: ? & # \ % < > +
  */
-export default function makeFilenameFromCaption(
+export default function makeFilename(
   caption: string | Record<'plain_text', string>[],
   maxLength = 50
 ): string | undefined {
