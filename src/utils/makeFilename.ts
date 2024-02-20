@@ -28,7 +28,9 @@ export default function makeFilename(
     // max characters
     .substring(0, maxLength)
     // remove trailing underscores
-    .replace(/_+$/, "");
+    .replace(/_+$/, "")
+    // remove multiple underscores
+    .replace(/_{2,}/g, "_");
 
   return filename
 }
